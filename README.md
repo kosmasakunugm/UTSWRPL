@@ -1,7 +1,3 @@
-Siap! Berikut versi `README.md` yang sudah diperbarui, bagian setup database diubah agar menggunakan file `fitnessmanagementsystem.sql`:
-
----
-
 # 💪 FitReserve - Aplikasi Pemesanan Fasilitas Olahraga
 
 FitReserve adalah aplikasi berbasis web yang dibuat dengan Python dan Streamlit untuk membantu pengguna mencari dan memesan fasilitas olahraga seperti gym, kolam renang, dan lapangan.
