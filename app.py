@@ -377,6 +377,81 @@ def registration_form():
     if st.button("Kembali ke Beranda"):
         st.session_state.show_register = False
         st.experimental_rerun()
+# Tambahkan fungsi untuk mengambil data fasilitas dari database
+def get_public_facilities(limit=3):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        query = """
+       SELECT 
+            f.FacilityID, 
+            f.NamaFasilitas, 
+            f.Lokasi, 
+            f.Deskripsi, 
+            f.FotoURL
+        FROM Facilities f
+        -- Jika Anda ingin menambahkan kondisi, misalnya WHERE f.Jenis = 'Gym', 
+        -- silakan tambahkan di sini. Karena dari screenshot tidak terlihat ada kolom 'Jenis' atau 'Tipe'.
+        LIMIT %s
+        """
+        cursor.execute(query, (limit,))
+        facilities = cursor.fetchall()
+        
+        cursor.close()
+        conn.close()
+        return facilities
+    
+    except Exception as e:
+        st.error(f"Gagal memuat data fasilitas: {str(e)}")
+        return []
+
+# Modifikasi halaman depan publik
+def public_landing_page():
+    st.markdown(f"""
+    <div style="text-align: center;">
+        <img src="https://via.placeholder.com/800x400?text=Welcome+to+FitReserve" style="width: 100%; border-radius: 15px; margin-bottom: 30px;">
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div style="text-align: center; margin-bottom: 50px;">
+        <h1>Selamat Datang di FitReserve 🏋️♂️</h1>
+        <h3>Temukan & Pesan Fasilitas Olahraga Terbaik di Kotamu!</h3>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.subheader("🔥 Fasilitas Terpopuler")
+    facilities = get_public_facilities()
+    
+    if facilities:
+        cols = st.columns(3)
+        for idx, facility in enumerate(facilities):
+            with cols[idx % 3]:
+                # Gunakan key 'FotoURL' sesuai dengan database
+                img_url = facility['FotoURL'] or "https://via.placeholder.com/300x200?text=No+Image"
+                st.image(img_url, use_column_width=True)
+                
+                st.markdown(f"**{facility['NamaFasilitas']}**")
+                st.caption(f"📍 {facility['Lokasi']}")
+                st.write(f"📝 {facility['Deskripsi'][:100]}...")
+                
+                # Tombol Lihat Detail, non-interaktif untuk saat ini
+                st.button("Lihat Detail", key=f"detail_{facility['FacilityID']}", disabled=True)
+    else:
+        st.warning("Belum ada fasilitas yang tersedia")
+    
+    # Tombol untuk aksi login atau registrasi
+    st.markdown("---")
+    login_col, reg_col, _ = st.columns([2,2,6])
+    with login_col:
+        if st.button("Masuk ke Akun Saya", use_container_width=True):
+            st.session_state.show_login = True
+            st.experimental_rerun()
+    with reg_col:
+        if st.button("Daftar Akun Baru", use_container_width=True):
+            st.session_state.show_register = True
+            st.experimental_rerun()
 
 # Modifikasi Fungsi Main
 def main():

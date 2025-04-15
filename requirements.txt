@@ -1,0 +1,6 @@
+streamlit
+mysql-connector-python
+qrcode
+Pillow
+streamlit-option-menu
+extra-streamlit-components
